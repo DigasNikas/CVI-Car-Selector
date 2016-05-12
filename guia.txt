@@ -1,0 +1,9 @@
+1. estimação de imagem de fundo (sugestão: utilizar filtro de mediana ou usar Bt = alpha*It + (1-alpha)*Bt-1)
+2. detecção de pixels activos
+3. utilização de operadores morfológicos
+4. detecção de regiões activas (rectangle)
+5. extracção de propriedades de região
+6. classificação e correspondência das regiões (alguém ler o paper!)
+7. visualização dos resultados
+
+mutual favorite pairing
