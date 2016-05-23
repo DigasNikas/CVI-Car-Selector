@@ -1,4 +1,5 @@
 close all;
+clear;
 
 path = 'CAMERA1_JPEGS_TRAINING\'; frameIdComp = 4;
 str = ['%s%.' num2str(frameIdComp) 'd.%s'];
@@ -21,27 +22,59 @@ end
 for k=1 : step : nFrame
     strl = sprintf(str, path,k,'jpg');
     img = imread(strl);
-    se = offsetstrel('ball',5,5);
-    
-    imDiff = (abs(double(img(:,:,1)) - double(bkg(:,:,1))) > th) | (abs(double(img(:,:,2)) - double(bkg(:,:,2))) > th) | (abs(double(img(:,:,3)) - double(bkg(:,:,3))) > th);
+     
+    imDiff = (abs(double(img(:,:,1)) - double(bkg(:,:,1))) > th) |...
+             (abs(double(img(:,:,2)) - double(bkg(:,:,2))) > th) |...
+             (abs(double(img(:,:,3)) - double(bkg(:,:,3))) > th);
     
     imDiff = medfilt2(imDiff);
+    imDiff = bwareaopen(imDiff, 20, 8);
     imDiff = bwconvhull(imDiff, 'objects');
-    %imDiff = imopen(imDiff, strel('disk',2));
-    %imDiff = imfill(imDiff, 'holes');
+    imDiff = bwmorph(imDiff,'fill');
     
-    props = regionprops(imDiff,'BoundingBox', 'Area','MajorAxisLength');
+    [lb num] = bwlabel(imDiff);
+    props = regionprops(lb,'BoundingBox', 'Area');
     
-    strl = sprintf(str, path,k,'jpg');
-    img = imread(strl);
-    imshow(img);
-    
-    text(10,30,int2str(k),'color','r');
-    for k = 1 : length(props)
-      thisBB = props(k).BoundingBox;
-      if(props(k).Area > 100)
-        rectangle('Position', [thisBB(1),thisBB(2),thisBB(3),thisBB(4)],'EdgeColor','r','LineWidth',2 )
-      end
+    auxVar = 1;
+    for prop = 1 : length(props)
+        if (props(prop).Area > 100)
+            aux(auxVar) = props(prop);
+            auxVar = auxVar + 1;
+        end
     end
+    
+    imshow(img);
+    text(10,30,int2str(k),'color','r');
+    
+    if (k == 1)
+        thatBB = cell(1, length(aux));
+        for n = 1 : length(aux)
+            thatBB{n} = aux(n).BoundingBox;
+        end
+    else
+        thisBB = cell(1,length(aux));
+        for m = 1 : length(aux)
+          thisBB{m} = aux(m).BoundingBox;
+        end
+        for i = 1 : length(thisBB)
+            for j = 1 : length(thatBB)
+                Diff = norm(thisBB{i} - thatBB{j},1);
+                if ( 8 < Diff )
+                    Matrix(i,j) = 1;
+                else
+                    Matrix(i,j) = 0;
+                end
+            end
+        end
+        for l = 1 : length(thisBB)
+            if( Matrix(l,:) == 1)
+                rectangle('Position', [thisBB{l}(1),thisBB{l}(2),thisBB{l}(3),thisBB{l}(4)],'EdgeColor','r','LineWidth',2 )
+                text(thisBB{l}(1)-10,thisBB{l}(2)-10,int2str(l),'color','r');
+                drawnow;
+            end
+        end
+        thatBB = thisBB;
+    end
+
     drawnow
 end
