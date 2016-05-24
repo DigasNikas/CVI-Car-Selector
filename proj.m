@@ -74,19 +74,19 @@ for k=1 : step : nFrame
                 end
             end
         end
-        for l = 1 : length(thisBB)
+        for l = 1 : length(thisBB) % Tratar todas as regiões assinaladas na Matrix
             if( Matrix(l,:) == 1)
-                if(thisBB{l}(3) < thisBB{l}(4))
+                if(thisBB{l}(3) < thisBB{l}(4)) % Caso sejam pessoas
                     rectangle('Position', [thisBB{l}(1),thisBB{l}(2),thisBB{l}(3),thisBB{l}(4)],'EdgeColor','g','LineWidth',2 )
                     text(thisBB{l}(1)-10,thisBB{l}(2)-20,'Person','color','g');
-                else
+                else % Caso sejam carros
                     rectangle('Position', [thisBB{l}(1),thisBB{l}(2),thisBB{l}(3),thisBB{l}(4)],'EdgeColor','r','LineWidth',2 )
                     text(thisBB{l}(1)-10,thisBB{l}(2)-20,'Car','color','r');
                 end
                 drawnow;
             end
         end
-        thatBB = thisBB;
+        thatBB = thisBB; % Preparar as BB do frame t para estarem presentes como t-1 no próximo frame
     end
 
     drawnow
