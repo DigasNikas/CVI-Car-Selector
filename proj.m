@@ -51,7 +51,7 @@ for k=1 : step : nFrame
     end
     % ------ Excluir regioes pequenas -------- %
     
-    imshow(img);
+    imshow(imDiff);
     text(10,30,int2str(k),'color','r');
     
     if (k == 1) % Primeiro frame para as diferenças
@@ -66,11 +66,23 @@ for k=1 : step : nFrame
         end
         for i = 1 : length(thisBB) % Verificar todas as diferenças entre as BB do frame t e t-1
             for j = 1 : length(thatBB)
-                Diff = norm(thisBB{i} - thatBB{j},1);
-                if ( 8 < Diff ) %Caso a diferenças seja significativa, assinalar na Matrix
+                DiffX = abs(thisBB{i}(1) - thatBB{j}(1));
+                DiffY = abs(thisBB{i}(2) - thatBB{j}(2));
+                if ( DiffX > 8 ) && ( DiffX < 20 ) && ( DiffY > 8 ) && ( DiffY < 20 ) %Caso a diferença seja significativa, assinalar na Matrix
                     Matrix(i,j) = 1;
                 else
                     Matrix(i,j) = 0;
+                end
+            end
+        end
+        MMatrix = transpose(Matrix);
+        for a = 1 : length(thisBB)
+            for b = 1 : length(thatBB)
+                if (Matrix(a,b) == 1)
+                    Smatrix(a) = b;
+                end
+                if (MMatrix(b,a) == 1)
+                    Tmatrix(a) = b;
                 end
             end
         end
